@@ -16,7 +16,7 @@ type Response struct {
 	}
 }
 
-type InverterResponse struct {
+type InverterDeviceResponse struct {
 	Response
 	Body struct {
 		Data struct {
@@ -36,9 +36,34 @@ type InverterResponse struct {
 	}
 }
 
+type InverterSystemResponse struct {
+	Response
+	Body struct {
+		Data struct {
+			Power          SystemProperty `json:"PAC"`
+			EnergyToday    SystemProperty `json:"DAY_ENERGY"`
+			EnergyThisYear SystemProperty `json:"YEAR_ENERGY"`
+			EnergyTotal    SystemProperty `json:"TOTAL_ENERGY"`
+			Status         struct {
+				Status                 int16 `json:"StatusCode"`
+				Error                  int16 `json:"ErrorCode"`
+				LEDColor               int16 // ?
+				LEDState               int16 // ?
+				Reset                  bool  // ?
+				MgmtTimerRemainingTime int16 // ?
+			} `json:"DeviceStatus"`
+		}
+	}
+}
+
 type Property struct {
 	Value float64
 	Unit  string
+}
+
+type SystemProperty struct {
+	Values map[string]float64
+	Unit   string
 }
 
 const (
