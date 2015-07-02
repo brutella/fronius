@@ -1,4 +1,4 @@
-package solar
+package fronius
 
 import (
 	"fmt"
@@ -7,22 +7,21 @@ import (
 )
 
 const (
+	SymoHostClassA          = "http://169.254.0.180"
 	solarAPIFormat          = "solar_api/v1"
 	getInverterRealtimeData = "GetInverterRealtimeData.cgi"
 	sysScope                = "Scope=System"
-	deviceScopeFormat       = "Scope=Device&DeviceId=%s"
 )
 
-func GetRealtimeDataRequestURL(ip string) string {
-	base := toHTTPHost(ip)
+func SystemRealtimeDataRequestURL(base string) string {
 	base = path(base, solarAPIFormat, getInverterRealtimeData)
 	arg := args(sysScope)
 
 	return append(base, arg)
 }
 
-func GetRealtimeData(ip string) (*http.Response, error) {
-	url := GetRealtimeDataRequestURL(ip)
+func GetSystemRealtimeData(base string) (*http.Response, error) {
+	url := SystemRealtimeDataRequestURL(base)
 
 	return http.Get(url)
 }

@@ -1,12 +1,11 @@
-package solar
+package fronius
 
 import (
 	"encoding/json"
 	"testing"
 )
 
-func TestSystemRealtimeData(t *testing.T) {
-	str := `{
+var systemRealtimeData string = `{
 	"Head" : {
 		"RequestArguments" : {
 			"DataCollection" : "",
@@ -49,7 +48,8 @@ func TestSystemRealtimeData(t *testing.T) {
 	}
 }`
 
-	b := []byte(str)
+func TestSystemRealtimeData(t *testing.T) {
+	b := []byte(systemRealtimeData)
 	rsp := InverterSystemResponse{}
 	if err := json.Unmarshal(b, &rsp); err != nil {
 		t.Fatal(err)
@@ -63,7 +63,7 @@ func TestSystemRealtimeData(t *testing.T) {
 		t.Error(x)
 	}
 
-	if is, want := rsp.Body.Data.Power.Values["1"], float64(766); is != want {
+	if is, want := rsp.Body.Data.Power.Values["1"], int64(766); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
@@ -71,12 +71,29 @@ func TestSystemRealtimeData(t *testing.T) {
 		t.Error(x)
 	}
 
-	if is, want := rsp.Body.Data.EnergyToday.Values["1"], float64(1622); is != want {
+	if is, want := rsp.Body.Data.EnergyToday.Values["1"], int64(1622); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
 	if x := rsp.Body.Data.EnergyToday.Unit; x != "Wh" {
 		t.Error(x)
+	}
+}
+
+func TestSystemRealtimeDataGetter(t *testing.T) {
+	b := []byte(systemRealtimeData)
+	rsp := InverterSystemResponse{}
+	if err := json.Unmarshal(b, &rsp); err != nil {
+		t.Fatal(err)
+	}
+
+	p := SystemCurrentPower(rsp)
+	if is, want := p.Value, int64(766); is != want {
+		t.Fatalf("is=%v want=%v", is, want)
+	}
+
+	if is, want := p.Unit, "W"; is != want {
+		t.Fatalf("is=%v want=%v", is, want)
 	}
 }
 
