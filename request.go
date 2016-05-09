@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	SymoHostClassA          = "http://169.254.0.180"
+	SymoHostClassA          = "169.254.0.180"
 	solarAPIFormat          = "solar_api/v1"
 	getInverterRealtimeData = "GetInverterRealtimeData.cgi"
 	sysScope                = "Scope=System"
