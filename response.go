@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// Response is the common response header (CRH)
 type Response struct {
 	Head struct {
 		RequestArguments struct {
@@ -23,6 +24,7 @@ type Response struct {
 	}
 }
 
+// InverterDeviceResponse is the 
 type InverterDeviceResponse struct {
 	Response
 	Body struct {

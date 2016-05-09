@@ -2,28 +2,23 @@ package fronius
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 )
 
 const (
-	SymoHostClassA          = "169.254.0.180"
+	SymoHostClassA          = "169.254.0.180:80"
 	solarAPIFormat          = "solar_api/v1"
 	getInverterRealtimeData = "GetInverterRealtimeData.cgi"
 	sysScope                = "Scope=System"
 )
 
+// SystemRealtimeDataRequestURL returns an url to request realtime inverter 
+// data from host.
 func SystemRealtimeDataRequestURL(host string) string {
 	base := path(toHTTPHost(host), solarAPIFormat, getInverterRealtimeData)
 	arg := args(sysScope)
 
 	return append(base, arg)
-}
-
-func GetSystemRealtimeData(base string) (*http.Response, error) {
-	url := SystemRealtimeDataRequestURL(base)
-
-	return http.Get(url)
 }
 
 func toHTTPHost(ip string) string {

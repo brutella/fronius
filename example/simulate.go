@@ -1,9 +1,12 @@
+// Example to demonstrate how to use the inverter simulator
 package main
 
 import (
 	"fmt"
 	"github.com/brutella/fronius"
 	"log"
+	"net/http"
+	"net/url"
 )
 
 func main() {
@@ -11,7 +14,8 @@ func main() {
 
 	defer s.Stop()
 
-	resp, err := fronius.GetSystemRealtimeData(s.URL())
+	url, _ := url.Parse(s.URL())
+	resp, err := http.Get(fronius.SystemRealtimeDataRequestURL(url.Host))
 
 	if err != nil {
 		log.Fatal(err)
