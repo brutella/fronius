@@ -13,8 +13,8 @@ const (
 	sysScope                = "Scope=System"
 )
 
-func SystemRealtimeDataRequestURL(base string) string {
-	base = path(base, solarAPIFormat, getInverterRealtimeData)
+func SystemRealtimeDataRequestURL(host string) string {
+	base := path(toHTTPHost(host), solarAPIFormat, getInverterRealtimeData)
 	arg := args(sysScope)
 
 	return append(base, arg)
