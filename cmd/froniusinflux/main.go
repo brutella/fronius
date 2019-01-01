@@ -38,12 +38,12 @@ func main() {
 		host     = flag.String("host", fronius.SymoHostClassA, "Host")
 		simulate = flag.Bool("simulate", false, "Simulate Fronius symo")
 	)
-
+	flag.Parse()
 	client := NewTimeoutClient(5*time.Second, 5*time.Second)
 
 	var resp *http.Response
 	var err error
-	if *simulate {
+	if *simulate == true {
 		s := fronius.NewSymoSimulator()
 		defer s.Stop()
 		url, _ := url.Parse(s.URL())
