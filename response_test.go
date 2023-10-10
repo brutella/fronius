@@ -63,7 +63,7 @@ func TestSystemRealtimeData(t *testing.T) {
 		t.Error(x)
 	}
 
-	if is, want := rsp.Body.Data.Power.Values["1"], int64(766); is != want {
+	if is, want := rsp.Body.Data.Power.Values["1"], float64(766); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
@@ -71,7 +71,7 @@ func TestSystemRealtimeData(t *testing.T) {
 		t.Error(x)
 	}
 
-	if is, want := rsp.Body.Data.EnergyToday.Values["1"], int64(1622); is != want {
+	if is, want := rsp.Body.Data.EnergyToday.Values["1"], float64(1622); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 
@@ -82,13 +82,13 @@ func TestSystemRealtimeData(t *testing.T) {
 
 func TestSystemRealtimeDataGetter(t *testing.T) {
 	b := []byte(systemRealtimeData)
-	rsp := InverterSystemResponse{}
-	if err := json.Unmarshal(b, &rsp); err != nil {
+	rsp := &InverterSystemResponse{}
+	if err := json.Unmarshal(b, rsp); err != nil {
 		t.Fatal(err)
 	}
 
 	p := SystemCurrentPower(rsp)
-	if is, want := p.Value, int64(766); is != want {
+	if is, want := p.Value, float64(766); is != want {
 		t.Fatalf("is=%v want=%v", is, want)
 	}
 

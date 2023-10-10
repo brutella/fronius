@@ -6,20 +6,15 @@ import (
 )
 
 const (
-	SymoHostClassA          = "169.254.0.180:80"
-	solarAPIFormat          = "solar_api/v1"
-	getInverterRealtimeData = "GetInverterRealtimeData.cgi"
-	sysScope                = "Scope=System"
+	SymoHostClassA       = "169.254.0.180:80"
+	solarAPIFormat       = "solar_api/v1"
+	ScopeSystem          = "System"
+	ScopeDevice          = "Device"
+	CollectionCumulation = "CumulationInverterData"
+	CollectionCommon     = "CommonInverterData"
+	Collection3Phases    = "3PInverterData"
+	CollectionMinMax     = "MinMaxInverterData"
 )
-
-// SystemRealtimeDataRequestURL returns an url to request realtime inverter 
-// data from host.
-func SystemRealtimeDataRequestURL(host string) string {
-	base := path(toHTTPHost(host), solarAPIFormat, getInverterRealtimeData)
-	arg := args(sysScope)
-
-	return append(base, arg)
-}
 
 func toHTTPHost(ip string) string {
 	return fmt.Sprintf("http://%s", ip)

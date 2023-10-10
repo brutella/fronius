@@ -1,10 +1,32 @@
 package fronius
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+)
+
+const (
+	// 0-6 == Startup
+	InverterStatusRunning     byte = 7
+	InverterStatusStandby          = 8
+	InverterStatusBootLoading      = 9
+	InverterStatusError            = 10
+)
+
+const (
+	StatusOk                 byte = 0   // Request successfully finished, Data are valid
+	StatusNotImplemented          = 1   // The request or a part of the request is not implemented yet
+	StatusUninitialized           = 2   // Instance of APIRequest created, but not yet configured
+	StatusInitialized             = 3   // Request is configured and ready to be sent
+	StatusRunning                 = 4   // Request is currently being processed (waiting for response)
+	StatusTimeout                 = 5   // Response was not received within desired time
+	StatusArgumentError           = 6   // Invalid arguments/combination of arguments or missing arguments
+	StatusLNRequestError          = 7   // Something went wrong during sending/receiving of LN-message
+	StatusLNRequestTimeout        = 8   // LN-request timed out
+	StatusLNParseError            = 9   // Something went wrong during parsing of successfully received LN-message
+	StatusConfigIOError           = 10  // Something went wrong while reading settings from local config
+	StatusNotSupported            = 11  // The operation/feature or whatever is not supported
+	StatusDeviceNotAvailable      = 12  // The device is not available
+	StatusUnknownError            = 255 // undefined runtime error
 )
 
 // Response is the common response header (CRH)
@@ -24,7 +46,7 @@ type Response struct {
 	}
 }
 
-// InverterDeviceResponse is the 
+// InverterDeviceResponse is the
 type InverterDeviceResponse struct {
 	Response
 	Body struct {
@@ -45,11 +67,44 @@ type InverterDeviceResponse struct {
 	}
 }
 
+type Inverter3PhasesDeviceResponse struct {
+	Response
+	Body struct {
+		Data struct {
+			Current1      Property `json:"IAC_L1"`
+			Current2      Property `json:"IAC_L2"`
+			Current3      Property `json:"IAC_L3"`
+			Voltage1      Property `json:"UAC_L1"`
+			Voltage2      Property `json:"UAC_L2"`
+			Voltage3      Property `json:"UAC_L3"`
+			FanFrontLeft  Property `json:"ROTATION_SPEED_FAN_FL"`
+			FanFrontRight Property `json:"ROTATION_SPEED_FAN_FR"`
+			FanBackLeft   Property `json:"ROTATION_SPEED_FAN_BL"`
+			FanBackRight  Property `json:"ROTATION_SPEED_FAN_BR"`
+		}
+	}
+}
+
+type InverterCommonDeviceResponse struct {
+	Response
+	Body struct {
+		Data struct {
+			Power     Property `json:"PAC"`
+			Current   Property `json:"IAC"`
+			Voltage   Property `json:"UAC"`
+			Frequence Property `json:"FAC"`
+			CurrentDC Property `json:"IDC"`
+			VoltageDC Property `json:"UDC"`
+		}
+	}
+}
+
 type InverterSystemResponse struct {
 	Response
 	Body struct {
 		Data struct {
 			Power          SystemProperty `json:"PAC"`
+			Current        SystemProperty `json:"IAC"`
 			EnergyToday    SystemProperty `json:"DAY_ENERGY"`
 			EnergyThisYear SystemProperty `json:"YEAR_ENERGY"`
 			EnergyTotal    SystemProperty `json:"TOTAL_ENERGY"`
@@ -65,18 +120,16 @@ type InverterSystemResponse struct {
 	}
 }
 
-func NewInverterSystemResponse(res *http.Response) (inv InverterSystemResponse, err error) {
-	b, err := ioutil.ReadAll(res.Body)
-
-	if err == nil {
-		err = json.Unmarshal(b, &inv)
-	}
-
-	return inv, err
+type InverterSystemReponseData struct {
 }
 
 type Property struct {
-	Value int64
+	Value float64
+	Unit  string
+}
+
+type NamedProperty struct {
+	Value float64
 	Unit  string
 }
 
@@ -85,12 +138,12 @@ func (p Property) String() string {
 }
 
 type SystemProperty struct {
-	Values map[string]int64
+	Values map[string]float64
 	Unit   string
 }
 
-func Sum(p SystemProperty) int64 {
-	var sum int64
+func Sum(p SystemProperty) float64 {
+	var sum float64
 	for _, value := range p.Values {
 		sum = sum + value
 	}
@@ -98,41 +151,28 @@ func Sum(p SystemProperty) int64 {
 	return sum
 }
 
-const (
-	// 0-6 == Startup
-	StatusRunning     int16 = 7
-	StatusStandby     int16 = 8
-	StatusBootLoading int16 = 9
-	StatusError       int16 = 10
-)
-
-// FIXME(brutella) Define more error codes
-const (
-	ErrorNo int16 = 0
-)
-
-func SystemCurrentPower(r InverterSystemResponse) Property {
+func SystemCurrentPower(r *InverterSystemResponse) Property {
 	value := Sum(r.Body.Data.Power)
 	unit := r.Body.Data.Power.Unit
 
 	return Property{value, unit}
 }
 
-func SystemEnergyToday(r InverterSystemResponse) Property {
+func SystemEnergyToday(r *InverterSystemResponse) Property {
 	value := Sum(r.Body.Data.EnergyToday)
 	unit := r.Body.Data.EnergyToday.Unit
 
 	return Property{value, unit}
 }
 
-func SystemEnergyThisYear(r InverterSystemResponse) Property {
+func SystemEnergyThisYear(r *InverterSystemResponse) Property {
 	value := Sum(r.Body.Data.EnergyThisYear)
 	unit := r.Body.Data.EnergyThisYear.Unit
 
 	return Property{value, unit}
 }
 
-func SystemEnergyTotal(r InverterSystemResponse) Property {
+func SystemEnergyTotal(r *InverterSystemResponse) Property {
 	value := Sum(r.Body.Data.EnergyTotal)
 	unit := r.Body.Data.EnergyTotal.Unit
 

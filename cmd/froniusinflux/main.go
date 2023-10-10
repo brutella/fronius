@@ -4,13 +4,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/brutella/fronius"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/brutella/fronius"
 )
 
 // from http://stackoverflow.com/a/16930649/424814
@@ -47,9 +48,9 @@ func main() {
 		s := fronius.NewSymoSimulator()
 		defer s.Stop()
 		url, _ := url.Parse(s.URL())
-		resp, err = client.Get(fronius.SystemRealtimeDataRequestURL(url.Host))
+		resp, err = client.Get(fronius.InverterSystemRealtimeDataRequestURL(url.Host))
 	} else {
-		resp, err = client.Get(fronius.SystemRealtimeDataRequestURL(*host))
+		resp, err = client.Get(fronius.InverterSystemRealtimeDataRequestURL(*host))
 	}
 
 	if err != nil {

@@ -3,10 +3,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/brutella/fronius"
 	"log"
 	"net/http"
 	"net/url"
+
+	"github.com/brutella/fronius"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 	defer s.Stop()
 
 	url, _ := url.Parse(s.URL())
-	resp, err := http.Get(fronius.SystemRealtimeDataRequestURL(url.Host))
+	resp, err := http.Get(fronius.InverterSystemRealtimeDataRequestURL(url.Host))
 
 	if err != nil {
 		log.Fatal(err)
