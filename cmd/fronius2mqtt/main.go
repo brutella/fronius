@@ -19,6 +19,7 @@ var (
 	mqttUser     = flag.String("mqtt_user", "", "MQTT user name")
 	mqttPassword = flag.String("mqtt_pw", "", "MQTT password")
 	tlsFlag      = flag.Bool("mqtt_tls", false, "Use TLS to connect to the broker")
+	delay        = flag.Duration("delay", 0*time.Second, "Delay before sending a request")
 )
 
 func config() *mqtt.Config {
@@ -46,6 +47,10 @@ func main() {
 	if *inverterAddr == "" || *mqttAddr == "" || *mqttUser == "" {
 		flag.Usage()
 		return
+	}
+
+	if delay != nil {
+		time.Sleep(*delay)
 	}
 
 	mqttClient, err := mqtt.VolatileSession("fronius2mqtt", config())
