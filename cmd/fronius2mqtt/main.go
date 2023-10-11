@@ -29,8 +29,9 @@ func config() *mqtt.Config {
 	}
 
 	config := mqtt.Config{
-		UserName: *mqttUser,
-		Password: []byte(*mqttPassword),
+		PauseTimeout: 5 * time.Second,
+		UserName:     *mqttUser,
+		Password:     []byte(*mqttPassword),
 	}
 
 	if TLS != nil {
@@ -84,5 +85,6 @@ func main() {
 
 	log.Println(err)
 
+	mqttClient.Disconnect(nil)
 	mqttClient.Close()
 }
