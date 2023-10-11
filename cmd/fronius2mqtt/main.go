@@ -51,6 +51,9 @@ func main() {
 		return
 	}
 
+	// gokrazy expects a non-zero status code
+	defer os.Exit(1)
+
 	if delay != nil {
 		time.Sleep(*delay)
 	}
@@ -88,6 +91,4 @@ func main() {
 
 	mqttClient.Disconnect(nil)
 	mqttClient.Close()
-
-	os.Exit(1)
 }
