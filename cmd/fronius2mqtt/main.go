@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/brutella/fronius"
@@ -87,4 +88,6 @@ func main() {
 
 	mqttClient.Disconnect(nil)
 	mqttClient.Close()
+
+	os.Exit(1)
 }
