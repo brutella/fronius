@@ -4,8 +4,8 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -85,9 +85,30 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err = mqttClient.Publish(ctx.Done(), []byte(fmt.Sprintf("%v", fronius.SystemCurrentPower(sys))), "pv/inverter/current")
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Println(err)
+		hostname = "unknown"
+	}
 
-	log.Println(err)
+	data := struct {
+		Host  string  `json:"host"`
+		Power float64 `json:"power"`
+	}{
+		Host:  hostname,
+		Power: fronius.SystemCurrentPower(sys).Value,
+	}
+	buf, err := json.Marshal(data)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = mqttClient.Publish(ctx.Done(), buf, "pv/inverter/current")
+
+	if err != nil {
+		log.Println(err)
+	}
 
 	mqttClient.Disconnect(nil)
 	mqttClient.Close()
